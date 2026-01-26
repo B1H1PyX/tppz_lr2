@@ -1,13 +1,16 @@
-/* Base variables */
 :root {
-    --bg-color: #ffffff;
-    --text-color: #222222;
+    --bg-color: #f9fafb;
+    --card-bg: #ffffff;
+    --text-color: #1f2933;
+    --muted-color: #6b7280;
     --accent-color: #0057b8;
+    --border-color: #e5e7eb;
     --max-width: 1100px;
+    --radius: 10px;
     --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Global styles */
+/* Reset helpers */
 * {
     box-sizing: border-box;
 }
@@ -17,73 +20,137 @@ body {
     font-family: var(--font-main);
     color: var(--text-color);
     background-color: var(--bg-color);
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
+/* Layout */
 .container {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
 }
 
 /* Header */
 header {
-    border-bottom: 1px solid #e5e5e5;
+    background: linear-gradient(135deg, #00be56, #006e40);
+    color: #ffffff;
+}
+
+header .container {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
 }
 
 .logo {
-    max-width: 120px;
+    max-width: 110px;
     margin-bottom: 1rem;
 }
 
+nav ul {
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+nav a:hover {
+    text-decoration: underline;
+    opacity: 1;
+}
+
 h1 {
-    font-size: 1.8rem;
+    font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
 h1 span {
     display: block;
-    font-size: 1rem;
-    font-weight: normal;
-    color: #555;
+    font-size: 1.05rem;
+    font-weight: 400;
+    opacity: 0.85;
 }
 
 .short-description {
     max-width: 800px;
+    margin-top: 1rem;
 }
 
 /* Main content */
-main section {
-    padding: 2rem 0;
-    border-bottom: 1px solid #f0f0f0;
+main {
+    padding: 3rem 0;
 }
 
-h2 {
+section {
+    margin-bottom: 2.5rem;
+}
+
+section > h2 {
     color: var(--accent-color);
     margin-bottom: 0.8rem;
+}
+
+section h3 {
+    margin-top: 1.2rem;
+}
+
+section p,
+section ul {
+    max-width: 900px;
 }
 
 ul {
     padding-left: 1.2rem;
 }
 
+li {
+    margin-bottom: 0.4rem;
+}
+
+/* Card style blocks */
+section {
+    background-color: var(--card-bg);
+    padding: 1.8rem 2rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin-top: 1rem;
+}
+
 /* Footer */
 footer {
     text-align: center;
-    padding: 1.5rem;
+    padding: 2rem 1rem;
+    color: var(--muted-color);
     font-size: 0.9rem;
-    color: #666;
 }
 
-/* Simple responsiveness */
+/* Responsive */
 @media (max-width: 768px) {
     h1 {
-        font-size: 1.4rem;
+        font-size: 1.6rem;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    section {
+        padding: 1.5rem;
     }
 }
