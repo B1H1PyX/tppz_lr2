@@ -1,0 +1,26 @@
+{
+  "name": "tppz_lr2",
+  "version": "1.0.0",
+  "description": "Односторінковий веб-сайт для представлення бакалаврської роботи.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/B1H1PyX/tppz_lr2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/B1H1PyX/tppz_lr2/issues"
+  },
+  "homepage": "https://github.com/B1H1PyX/tppz_lr2#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.1.0"
+  }
+}
