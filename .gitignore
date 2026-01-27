@@ -1,0 +1,13 @@
+# Node dependencies
+node_modules/
+
+# Build output (якщо є)
+dist/
+*.min.js
+
+# OS файли
+.DS_Store
+Thumbs.db
+
+# Локальні налаштування IDE
+.vscode/
