@@ -4,7 +4,9 @@
   "description": "Односторінковий веб-сайт для представлення бакалаврської роботи.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docs": "jsdoc -c jsdoc.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,8 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
-    "globals": "^17.1.0"
+    "globals": "^17.1.0",
+    "husky": "^8.0.0",
+    "jsdoc": "^4.0.5"
   }
 }
