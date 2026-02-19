@@ -34,76 +34,102 @@ function generateErrorId() {
 }
 
 function showErrorModal(message, errorId) {
-    setTimeout(() => {
-        if (window.showErrorToUser) {
-            window.showErrorToUser(message, errorId);
-        } else {
-            createFallbackModal(message, errorId);
-        }
-    }, 100);
+    console.log('📢 showErrorModal викликано:', { message, errorId });
+    
+    // Спочатку пробуємо використати глобальну функцію
+    if (window.showErrorToUser) {
+        console.log('✅ Використовуємо window.showErrorToUser');
+        window.showErrorToUser(message, errorId);
+        return;
+    }
+    
+    // Якщо немає, створюємо просте модальне вікно
+    console.log('⚠️ Створюємо запасне модальне вікно');
+    createFallbackModal(message, errorId);
 }
 
 function createFallbackModal(message, errorId) {
-    let modal = document.getElementById('fallbackErrorModal');
+    // Видаляємо попереднє модальне вікно якщо є
+    const oldModal = document.getElementById('fallbackErrorModal');
+    if (oldModal) oldModal.remove();
     
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'fallbackErrorModal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 10001;
-            max-width: 400px;
-            width: 90%;
-            font-family: Arial, sans-serif;
-            border-top: 5px solid #dc3545;
-        `;
-        
-        modal.innerHTML = `
-            <div style="text-align: center;">
-                <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
-                <h3 style="color: #dc3545; margin: 10px 0; font-size: 1.5rem;">Помилка</h3>
-                <p id="fallbackErrorMessage" style="margin: 15px 0; color: #333; line-height: 1.5;"></p>
-                <p style="font-size: 12px; color: #666; background: #f8f9fa; padding: 8px; border-radius: 4px;">
-                    Код: <span id="fallbackErrorCode"></span>
+    const modal = document.createElement('div');
+    modal.id = 'fallbackErrorModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        z-index: 999999;
+        max-width: 450px;
+        width: 90%;
+        font-family: Arial, sans-serif;
+        border-top: 8px solid #dc3545;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    // Додаємо анімацію
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -30%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    modal.innerHTML = `
+        <div style="text-align: center;">
+            <div style="font-size: 64px; margin-bottom: 15px; line-height: 1;">⚠️</div>
+            <h3 style="color: #dc3545; margin: 10px 0 20px; font-size: 1.8rem; font-weight: bold;">Помилка</h3>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p id="fallbackErrorMessage" style="margin: 0 0 10px; color: #333; font-size: 1.1rem; line-height: 1.5;"></p>
+                <p style="font-size: 13px; color: #666; margin: 0; word-break: break-all;">
+                    Код: <span id="fallbackErrorCode" style="font-family: monospace; background: #e9ecef; padding: 3px 6px; border-radius: 4px;"></span>
                 </p>
-                <button onclick="this.closest('#fallbackErrorModal').remove()"
-                        style="
-                            background: #007bff;
-                            color: white;
-                            border: none;
-                            padding: 10px 30px;
-                            border-radius: 5px;
-                            cursor: pointer;
-                            font-size: 16px;
-                            margin-top: 15px;
-                        ">
-                    Закрити
-                </button>
             </div>
-        `;
-        
-        document.body.appendChild(modal);
-    }
+            <button onclick="document.getElementById('fallbackErrorModal').remove()"
+                    style="
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 12px 40px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: bold;
+                        transition: background 0.2s;
+                    "
+                    onmouseover="this.style.background='#0056b3'"
+                    onmouseout="this.style.background='#007bff'">
+                Закрити
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
     
     const msgEl = document.getElementById('fallbackErrorMessage');
     const codeEl = document.getElementById('fallbackErrorCode');
     
-    if (msgEl && codeEl) {
-        msgEl.textContent = message || 'Невідома помилка';
-        codeEl.textContent = errorId || 'N/A';
-    }
+    if (msgEl) msgEl.textContent = message || 'Невідома помилка';
+    if (codeEl) codeEl.textContent = errorId || 'N/A';
     
+    // Автоматично сховати через 15 секунд
     setTimeout(() => {
         const modalToRemove = document.getElementById('fallbackErrorModal');
         if (modalToRemove) modalToRemove.remove();
-    }, 10000);
+    }, 15000);
 }
 
 const logger = {
@@ -115,15 +141,29 @@ const logger = {
     
     error: (...args) => {
         const errorId = log(LOG_LEVELS.ERROR, '❌ ERROR', ...args);
-        const message = args.map(a => String(a)).join(' ');
-        showErrorModal(message, errorId);
+        const message = args.map(a => {
+            if (a instanceof Error) return a.message;
+            if (typeof a === 'object') return JSON.stringify(a);
+            return String(a);
+        }).join(' ');
+        
+        // ВАЖЛИВО: викликаємо показ модального вікна
+        setTimeout(() => showErrorModal(message, errorId), 0);
+        
         return errorId;
     },
     
     critical: (...args) => {
         const errorId = log(LOG_LEVELS.CRITICAL, '🔥 CRITICAL', ...args);
-        const message = 'КРИТИЧНО: ' + args.map(a => String(a)).join(' ');
-        showErrorModal(message, errorId);
+        const message = 'КРИТИЧНО: ' + args.map(a => {
+            if (a instanceof Error) return a.message;
+            if (typeof a === 'object') return JSON.stringify(a);
+            return String(a);
+        }).join(' ');
+        
+        // ВАЖЛИВО: викликаємо показ модального вікна
+        setTimeout(() => showErrorModal(message, errorId), 0);
+        
         return errorId;
     },
 
@@ -146,7 +186,7 @@ const logger = {
         console.log('Total logs:', logHistory.length);
         console.table(logHistory.slice(-20));
         console.groupEnd();
-        logger.info('Логи експортовано. Скопіюйте їх для аналізу.');
+        logger.info('Логи експортовано');
     },
 
     getLastLogs: (count = 50) => {
@@ -160,38 +200,18 @@ function log(level, prefix, ...args) {
     const timestamp = new Date().toISOString();
     let errorId = null;
 
-    const serializedArgs = args.map(arg => {
-        try {
-            if (arg instanceof Error) {
-                return {
-                    name: arg.name,
-                    message: arg.message,
-                    stack: arg.stack
-                };
-            }
-            if (typeof arg === 'object') {
-                return JSON.parse(JSON.stringify(arg));
-            }
-            return arg;
-        } catch (e) {
-            return String(arg);
-        }
-    });
+    if (level >= LOG_LEVELS.ERROR) {
+        errorId = generateErrorId();
+    }
 
     const logEntry = {
         timestamp,
         sessionId: SESSION_ID,
         pageUrl: PAGE_URL,
-        userAgent: navigator.userAgent,
         level: Object.keys(LOG_LEVELS).find(key => LOG_LEVELS[key] === level),
         message: args.map(a => String(a)).join(' '),
-        data: serializedArgs
+        errorId
     };
-
-    if (level >= LOG_LEVELS.ERROR) {
-        errorId = generateErrorId();
-        logEntry.errorId = errorId;
-    }
 
     logHistory.push(logEntry);
     if (logHistory.length > MAX_LOG_HISTORY) {
@@ -213,8 +233,6 @@ function log(level, prefix, ...args) {
 }
 
 function sendErrorToServer(logEntry) {
-    console.warn('🔄 Відправка критичної помилки на сервер:', logEntry.errorId);
-    
     try {
         const pendingErrors = JSON.parse(localStorage.getItem('pending_errors') || '[]');
         pendingErrors.push({
@@ -230,16 +248,20 @@ function sendErrorToServer(logEntry) {
 
 window.appLogger = logger;
 
+// ВАЖЛИВО: Додаємо showErrorToUser глобально, якщо його немає
+if (!window.showErrorToUser) {
+    window.showErrorToUser = (message, errorId) => {
+        console.log('🟡 showErrorToUser викликано з глобального');
+        createFallbackModal(message, errorId);
+    };
+}
+
 logger.info('🟢 Система логування ініціалізована');
-logger.debug('Session ID:', SESSION_ID);
-logger.debug('Page URL:', PAGE_URL);
-logger.debug('User Agent:', navigator.userAgent);
 
 window.testLogger = {
-    error: () => logger.error('Тестова помилка з логера'),
-    critical: () => logger.critical('Тестова критична помилка з логера'),
-    info: () => logger.info('Тестове інформаційне повідомлення')
+    error: () => logger.error('✅ Тестова помилка - має з\'явитись вікно!'),
+    critical: () => logger.critical('🔥 Тестова критична помилка - має з\'явитись вікно!'),
+    modal: () => showErrorModal('Прямий тест модального вікна', 'TEST-123')
 };
 
-export default logger;
-export { LOG_LEVELS, generateErrorId };
+console.log('✅ Логер готовий. Спробуйте: testLogger.error()');
