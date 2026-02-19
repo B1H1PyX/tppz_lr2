@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://USERNAME.github.io/REPO_NAME/sitemap.xml
+Sitemap: https://B1H1PyX.github.io/tppz_lr2/sitemap.xml
