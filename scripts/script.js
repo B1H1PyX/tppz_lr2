@@ -2,9 +2,34 @@
  * Головний скрипт сторінки
  */
 
-import logger from './logger.js';
-import './errorModal.js'; // Імпортуємо для ініціалізації модального вікна
+// ВСІ ІМПОРТИ ПОВИННІ БУТИ НА ПОЧАТКУ ФАЙЛУ!
+import './errorModal.js';
 import { getUserFriendlyMessage } from './errorMessages.js';
+
+// Тепер можна використовувати logger
+const logger = window.appLogger || {
+    debug: (...args) => console.debug('🔍 DEBUG:', ...args),
+    info: (...args) => console.info('ℹ️ INFO:', ...args),
+    warn: (...args) => console.warn('⚠️ WARN:', ...args),
+    error: (...args) => console.error('❌ ERROR:', ...args),
+    critical: (...args) => {
+        console.error('🔥 CRITICAL:', ...args);
+        // Якщо є модальне вікно, показуємо помилку
+        if (window.showErrorToUser) {
+            const errorId = 'CRIT-' + Date.now();
+            window.showErrorToUser(args[0] || 'Критична помилка', errorId);
+        }
+    },
+    setLevel: (level) => console.log('Рівень логування змінено на', level)
+};
+
+// Ініціалізація модального вікна після завантаження DOM
+document.addEventListener('DOMContentLoaded', () => {
+    // Якщо функція initErrorModal існує, викликаємо її
+    if (window.initErrorModal) {
+        window.initErrorModal();
+    }
+});
 
 /**
  * Ініціалізує кнопку "Scroll to Top"
@@ -14,13 +39,12 @@ function initScrollToTop() {
     
     if (!scrollBtn) {
         logger.error('Кнопку "scrollTopBtn" не знайдено');
-        window.showErrorToUser?.({ message: 'ELEMENT_NOT_FOUND' }, 'ELEMENT_NOT_FOUND');
+        window.showErrorToUser?.('Елемент кнопки не знайдено', 'ELEMENT_NOT_FOUND');
         return;
     }
 
     logger.debug('Кнопку "scrollTopBtn" знайдено, додаємо обробники');
 
-    // Показ/приховування кнопки при прокрутці
     window.addEventListener('scroll', () => {
         try {
             const shouldShow = window.scrollY > 300;
@@ -38,7 +62,6 @@ function initScrollToTop() {
         }
     });
 
-    // Обробка кліку по кнопці
     scrollBtn.addEventListener('click', () => {
         try {
             logger.info('Користувач натиснув кнопку "Вгору"');
@@ -76,6 +99,7 @@ function initSmoothNavigation() {
                 });
             } else {
                 logger.warn(`Елемент ${targetId} не знайдено для навігації`);
+                window.showErrorToUser?.(`Секцію ${targetId} не знайдено`, 'NAVIGATION_ERROR');
             }
         });
     });
@@ -89,17 +113,18 @@ function initImageErrorHandling() {
     
     images.forEach(img => {
         img.addEventListener('error', (event) => {
-            const errorId = logger.error(`Помилка завантаження зображення: ${img.src}`);
+            logger.error(`Помилка завантаження зображення: ${img.src}`);
             
             // Заміна на заглушку
             img.src = 'img/placeholder.webp';
             img.alt = 'Зображення не завантажилось';
             
-            // Показуємо повідомлення користувачу
-            window.showErrorToUser?.(
-                { message: 'IMAGE_LOAD_ERROR' },
-                errorId || 'IMAGE_LOAD_ERROR'
-            );
+            window.showErrorToUser?.('Не вдалося завантажити зображення', 'IMAGE_LOAD_ERROR');
+        });
+        
+        // Логуємо успішне завантаження
+        img.addEventListener('load', () => {
+            logger.debug(`Зображення завантажено: ${img.src}`);
         });
     });
 }
@@ -117,8 +142,8 @@ function initApp() {
         
         logger.info('✅ Додаток успішно ініціалізовано');
     } catch (error) {
-        const errorId = logger.critical('Критична помилка при ініціалізації:', error);
-        window.showErrorToUser?.(error, errorId);
+        logger.critical('Критична помилка при ініціалізації:', error);
+        window.showErrorToUser?.(error, 'INIT_ERROR');
     }
 }
 
@@ -138,9 +163,9 @@ window.addEventListener('beforeunload', () => {
     logger.info('🔴 Сторінка вивантажується');
 });
 
-// Додаємо глобальний обробник помилок
+// Глобальний обробник помилок
 window.addEventListener('error', (event) => {
-    const errorId = logger.critical('Неперехоплена помилка:', {
+    logger.critical('Неперехоплена помилка:', {
         message: event.message,
         filename: event.filename,
         lineno: event.lineno,
@@ -148,16 +173,32 @@ window.addEventListener('error', (event) => {
         error: event.error
     });
     
-    window.showErrorToUser?.(event.error || event, errorId);
+    window.showErrorToUser?.(event.error || event.message, 'GLOBAL_ERROR');
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-    const errorId = logger.critical('Необроблений проміс:', event.reason);
-    window.showErrorToUser?.(event.reason, errorId);
+    logger.critical('Необроблений проміс:', event.reason);
+    window.showErrorToUser?.(event.reason, 'PROMISE_ERROR');
 });
 
-// Додаємо можливість зміни рівня логування з консолі
+// Функція для зміни рівня логування
 window.changeLogLevel = (level) => {
-    logger.setLevel(level);
-    console.log(`Рівень логування змінено на ${level}`);
+    if (logger.setLevel) {
+        logger.setLevel(level);
+    } else {
+        console.log(`Рівень логування (імітація): ${level}`);
+    }
 };
+
+// Тестові функції (можна викликати з консолі)
+window.testError = () => {
+    logger.error('Тестова помилка');
+    window.showErrorToUser?.('Тестова помилка', 'TEST_ERROR');
+};
+
+window.testCritical = () => {
+    logger.critical('Тестова критична помилка');
+    window.showErrorToUser?.('Тестова критична помилка', 'TEST_CRITICAL');
+};
+
+console.log('✅ Script.js завантажено з правильним порядком імпортів');
