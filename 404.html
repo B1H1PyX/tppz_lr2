@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Сторінку не знайдено</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .error-404-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .error-404-content {
+            max-width: 600px;
+        }
+        
+        .error-404-title {
+            font-size: 6rem;
+            margin: 0;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+        
+        .error-404-subtitle {
+            font-size: 2rem;
+            margin: 1rem 0;
+        }
+        
+        .error-404-text {
+            color: var(--muted-color);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        
+        .error-404-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .error-404-btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .error-404-btn:hover {
+            background-color: #003f8a;
+            transform: translateY(-2px);
+        }
+        
+        .error-404-btn.secondary {
+            background-color: #e9ecef;
+            color: var(--text-color);
+        }
+        
+        .error-404-btn.secondary:hover {
+            background-color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-404-container">
+        <div class="error-404-content">
+            <h1 class="error-404-title">404</h1>
+            <h2 class="error-404-subtitle">Сторінку не знайдено</h2>
+            <p class="error-404-text">
+                Вибачте, але сторінка, яку ви шукаєте, не існує або була переміщена.
+                Можливо, ви перейшли за застарілим посиланням або допустили помилку в адресі.
+            </p>
+            <div class="error-404-actions">
+                <a href="/" class="error-404-btn">🏠 На головну</a>
+                <a href="mailto:bihipyxcom@gmail.com?subject=Помилка%20404" class="error-404-btn secondary">
+                    📧 Повідомити про проблему
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
